@@ -1,0 +1,25 @@
+# .codex/config.toml — project defaults for this repo
+# Personal defaults live in ~/.codex/config.toml; this file is repo-scoped and
+# should be committed so every teammate (and the demo) behaves the same way.
+
+# Strong default model for analysis and drafting.
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+
+# Keep the agent honest by default. Loosen only for trusted, well-understood steps.
+# approval_policy / sandbox_mode shown here as the conservative starting point.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Subagent orchestration limits.
+# max_threads caps concurrent agent threads; max_depth = 1 lets the main agent
+# spawn children but blocks deeper recursive fan-out (cheaper, more predictable).
+[agents]
+max_threads = 6
+max_depth = 1
+
+# Example MCP server wiring. Add real connectors only when they remove a manual
+# loop you actually do. For this project, a docs/web-fetch MCP is the obvious one.
+# [mcp_servers.public_records]
+# url = "http://localhost:3000/mcp"
+# startup_timeout_sec = 20

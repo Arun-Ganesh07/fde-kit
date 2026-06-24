@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zipline.internal/schema/claim.schema.json",
+  "title": "Claim",
+  "description": "A single extracted fact about a jurisdiction, tied to a source line.",
+  "type": "object",
+  "required": ["id", "jurisdiction", "text", "category", "status"],
+  "properties": {
+    "id": { "type": "string", "description": "Stable id, e.g. 'frisco-0007'." },
+    "jurisdiction": { "type": "string" },
+    "text": { "type": "string", "description": "The claim in one sentence." },
+    "category": {
+      "type": "string",
+      "enum": ["zoning", "approval_path", "koz", "precedent", "political", "infrastructure", "other"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["supported", "unverified"],
+      "description": "'supported' requires a resolvable source_ref. 'unverified' must include needs_to_confirm."
+    },
+    "source_ref": {
+      "type": "object",
+      "description": "Required when status = supported.",
+      "required": ["path", "locator"],
+      "properties": {
+        "path": { "type": "string", "description": "File under sources/." },
+        "locator": { "type": "string", "description": "Page, line, or section a human can open." },
+        "retrieved_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "needs_to_confirm": {
+      "type": "string",
+      "description": "Required when status = unverified: which document would confirm this."
+    },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high"] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "supported" } } },
+      "then": { "required": ["source_ref"] }
+    },
+    {
+      "if": { "properties": { "status": { "const": "unverified" } } },
+      "then": { "required": ["needs_to_confirm"] }
+    }
+  ]
+}

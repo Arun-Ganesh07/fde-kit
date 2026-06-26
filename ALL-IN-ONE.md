@@ -79,21 +79,16 @@ Rehearsing this dry-run twice before the hackathon is worth more than another sc
 
 You don't pick the realm — they assign it on the day. But you DO pick the *shape* of the tool that wraps the spine. Default to the highest one that fits the assigned realm.
 
-### Tier 1 — The big-swing wow (build if you have time)
+### Tier 1 — The big-swing wow: the Proactive Watcher
 
-**Drift Watch — proactive market monitor.** A read-only agent that runs nightly over jurisdictions Zipline *already operates in* and pings Slack when something changes (council adds a noise ordinance, NOTAM lands, hostile public-comment thread trends, parcel rezoned, staff report drops). Each alert cites the exact source line.
-- **Why it wows:** posture change, not a feature. They check jurisdictions on *entry*; this makes them continuously aware. The "upgrade" of the brief they gave you.
-- **Pitch line:** *"Today the first person who finds out a city changed its rules is a permit officer telling you 'no.' Tomorrow you find out the morning the agenda drops."*
-- **Best fit if assigned:** Jurisdiction/Zoning, Government Affairs.
-- **Same spine, new trigger:** fetch→extract→analyze→draft→verify, but the analyst diffs against last night's extracted state.
+Not a tool you *ask* — an agent that runs on its own, watches a source, and pushes a cited alert you didn't know to ask for. Marcus said "set persistent goals"; almost nobody will actually build this mode. **See full deep-dive at the end of this section.**
 
-**Objection Rehearsal Partner.** Feed it next week's council meeting agenda; it generates the questions opponents will ask + cited prep answers. Voice-mode lets a non-engineer rehearse out loud.
-- **Why it wows:** directly attacks the 50% — it's a tool FOR non-coders to win adversarial conversations.
-- **Best fit if assigned:** Government Affairs, Community Stakeholder Support.
+**Why this wins this room:** it's the surface they like (Slack) used in the mode they didn't spell out (autonomous/push). The trust layer aims straight at Security & Safety leads. *"It told me before I knew to ask"* is the line that gets repeated at Top Golf.
 
-**Permit Packet Pre-flight Check.** Reads a draft permit packet against the jurisdiction's actual submission checklist; finds missing pieces *before* submission.
-- **Why it wows:** every avoided rejection cycle saves weeks. Joey loves the no-human-error story. Eric loves the safety-review-built-in.
-- **Best fit if assigned:** Jurisdiction/Zoning, Launch Coordination.
+Two adjacent Tier-1 alternatives if a watcher doesn't fit the assigned realm:
+
+- **Objection Rehearsal Partner.** Feed it next week's council meeting agenda; it generates the questions opponents will ask + cited prep answers. Voice-mode lets a non-engineer rehearse out loud. *Directly attacks the 50% — a tool FOR non-coders to win adversarial conversations.* Best fit: Government Affairs, Community Stakeholder Support.
+- **Permit Packet Pre-flight Check.** Reads a draft permit packet against the jurisdiction's actual submission checklist; finds missing pieces *before* submission. Every avoided rejection cycle saves weeks. Best fit: Jurisdiction/Zoning, Launch Coordination.
 
 ### Tier 2 — The reliable wow (default this if uncertain)
 
@@ -119,6 +114,90 @@ Assigned realm? Build Tier 2 (Slack bot) as the base.
 Time left after Tier 2 works? Bolt on a Tier 1 element if it fits the realm.
 Time crunched? Drop to Tier 3 CLI. Don't try to half-build Tier 1.
 ```
+
+---
+
+## Proactive Watcher — Deep dive (Tier 1 big-swing)
+
+The differentiated play: not a tool you *ask*, but an agent that **runs on its own, watches a source, and pushes a cited alert you didn't know to ask for.**
+
+### One engine, re-pointable (this is the "operating" story)
+
+Every watcher below is the **same pipeline** you already have, plus two pieces:
+
+```
+trigger → fetch → extract → analyze → draft → VERIFY → notify
+(schedule/    (your existing spine, cite-or-flag intact)      (Slack/
+ new-doc/                                                       email/
+ threshold)                                                     doc)
+```
+
+Build it once; swap the source + trigger to hit any assignment. Say this verbatim to evaluators: *"the watcher is one engine; the domain is config."* Single most FDE sentence you can say.
+
+**Implementation note:** day-of, the "trigger" is almost certainly a **cron job + diff against last-run state** (not a real webhook). Real webhook is a v2 story. Mention this proactively if Joey asks — shows you know what's actually shippable Monday.
+
+### The non-negotiable demo mechanic
+
+A watcher's wow only lands if it **fires live on stage.** **Pre-stage a trigger** — a planted agenda item / bill / stale site — so the alert pops *during* the demo, not "imagine it runs nightly." No live fire, no wow.
+
+### Watcher A — Jurisdiction Approval-Risk (strongest fit)
+
+- **Trigger:** new planning-commission / city-council agenda or minutes posted for a watched jurisdiction; or a zoning-ordinance change.
+- **Source:** public — Municode/American Legal, city planning agendas & minutes, local news.
+- **Cited output:** *"Frisco PC agenda 3/14 has a drone/UAS zoning item; here's the approval-path read, likely objections, and a mitigation"* — every claim linked to the source line.
+- **10-sec wow:** *"It found the approval risk while you were asleep."*
+- **Self-catch beat:** one claim shows as **UNVERIFIED** with "would be confirmed by the staff report" — that's the feature.
+- **Feasibility:** highest. Public, real, demo-able cold.
+
+### Watcher B — Regulatory & Policy Change
+
+- **Trigger:** new FAA rulemaking, state bill, or environmental notice matching watched topics.
+- **Source:** public — regulations.gov, state legislature feeds, FAA notices.
+- **Cited output:** *"New state bill HB-#### affects BVLOS operating areas — here's the obligation it creates and the recommended next action,"* cited to the bill text.
+- **10-sec wow:** *"It read the bill the day it dropped and told you what to do about it."*
+- **Self-catch beat:** flags interpretation it can't ground (*"impact on existing sites UNVERIFIED — needs legal review"*).
+- **Feasibility:** high. Public data; relevance-classification is the meat.
+
+### Watcher C — Community Sentiment / Complaint Trend
+
+- **Trigger:** sentiment spike or complaint-volume threshold crossed for a launched market.
+- **Source:** local news + (provided) complaint inbox/sample feed.
+- **Cited output:** *"Negative trend in [market] around noise this week — 7 signals, here are the 3 urgent ones routed to Community Engagement,"* each linked to the underlying item.
+- **10-sec wow:** *"It caught the noise backlash forming before it hit a council meeting."*
+- **Self-catch beat:** distinguishes confirmed complaints from unverified social chatter rather than treating them as equal.
+- **Feasibility:** medium — needs a believable signal source; pre-stage sample data.
+
+### Watcher D — Site Pipeline Blocker / Staleness
+
+- **Trigger:** a site has no movement in N days, or a blocker exists with no owner.
+- **Source:** the messy provided trackers/Slack/docs.
+- **Cited output:** *"3 sites stalled >14 days. Frisco: blocked on lease redline, no owner. Next action: assign legal,"* each fact cited to where it came from.
+- **10-sec wow:** *"It noticed the site stalled before the weekly sync did."*
+- **Self-catch beat:** *"owner UNVERIFIED — not stated in any source"* instead of guessing a name.
+- **Feasibility:** medium — runs over *provided* sample data; arguably more on-target.
+
+### Watcher E — Launch Readiness / Slip Detector
+
+- **Trigger:** a go-live dependency slips, putting a launch date at risk.
+- **Source:** provided launch checklists/playbooks across teams.
+- **Cited output:** *"[Location] go-live at risk: construction sign-off slipped, 3 downstream tasks now late. Owners + recommended re-sequence,"* cited to the checklist state.
+- **10-sec wow:** *"It flagged the launch would slip days before anyone noticed."*
+- **Self-catch beat:** flags assumptions about dependencies it can't confirm.
+- **Feasibility:** medium — needs structured-ish sample input.
+
+### How to choose the variant on the day
+
+1. During **User Discovery**, ask each problem owner: *"what do you wish you'd known sooner / what blindsides you?"* The watcher's value is catching things early — pick the owner whose pain is **late discovery.**
+2. Prefer **A or B** (public-source) if you want a fully live cold demo; prefer **D or E** if the assignment hands you rich internal sample data.
+3. Whichever you pick, keep it to **one source, one alert type.** A watcher that does one thing reliably > one that watches five things flakily.
+
+### The Watcher pitch frame
+
+> Open: *"Today an expansion lead finds out about [risk] by manually trawling [agendas/bills/trackers] — usually too late."*
+> → fire the live alert →
+> click a claim to its source →
+> point at the UNVERIFIED flag (*"that's the feature"*) →
+> Land it: *"This is the persistent-goal, operating-not-prompting agent you described — and the same engine re-points at every other realm."*
 
 ---
 

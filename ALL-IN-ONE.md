@@ -75,6 +75,51 @@ Translation: ship-shape > polish. A boring Python script that actually runs agai
 
 Rehearsing this dry-run twice before the hackathon is worth more than another scaffold tweak. You're rehearsing the **operating loop**, not the codebase.
 
+## Project shapes to aim for (ranked by "wow")
+
+You don't pick the realm — they assign it on the day. But you DO pick the *shape* of the tool that wraps the spine. Default to the highest one that fits the assigned realm.
+
+### Tier 1 — The big-swing wow (build if you have time)
+
+**Drift Watch — proactive market monitor.** A read-only agent that runs nightly over jurisdictions Zipline *already operates in* and pings Slack when something changes (council adds a noise ordinance, NOTAM lands, hostile public-comment thread trends, parcel rezoned, staff report drops). Each alert cites the exact source line.
+- **Why it wows:** posture change, not a feature. They check jurisdictions on *entry*; this makes them continuously aware. The "upgrade" of the brief they gave you.
+- **Pitch line:** *"Today the first person who finds out a city changed its rules is a permit officer telling you 'no.' Tomorrow you find out the morning the agenda drops."*
+- **Best fit if assigned:** Jurisdiction/Zoning, Government Affairs.
+- **Same spine, new trigger:** fetch→extract→analyze→draft→verify, but the analyst diffs against last night's extracted state.
+
+**Objection Rehearsal Partner.** Feed it next week's council meeting agenda; it generates the questions opponents will ask + cited prep answers. Voice-mode lets a non-engineer rehearse out loud.
+- **Why it wows:** directly attacks the 50% — it's a tool FOR non-coders to win adversarial conversations.
+- **Best fit if assigned:** Government Affairs, Community Stakeholder Support.
+
+**Permit Packet Pre-flight Check.** Reads a draft permit packet against the jurisdiction's actual submission checklist; finds missing pieces *before* submission.
+- **Why it wows:** every avoided rejection cycle saves weeks. Joey loves the no-human-error story. Eric loves the safety-review-built-in.
+- **Best fit if assigned:** Jurisdiction/Zoning, Launch Coordination.
+
+### Tier 2 — The reliable wow (default this if uncertain)
+
+**Slack bot wrapping the cited memo generator.** `/brief frisco-tx` in a real Slack channel → bot posts cited memo → click any claim → DM with source PDF page. Show verifier-reject → repair → re-verify happen as Slack messages in-thread.
+- **Why it wows:** their brief explicitly says *"a Slack bot fully hooked up to webhooks/socket mode gets us excited."* Lives in their real tool. Beats any web UI.
+- **Best fit if assigned:** any realm. Most adaptable.
+
+### Tier 3 — The safe baseline (fallback if time-crunched)
+
+**CLI-only cited memo generator.** `zip brief frisco-tx` in terminal → cited markdown opens in their editor. Boring, fast, real.
+- **Why it works:** their brief literally says *"a local 'help me do this 100x faster' .py counts."* Loses wow, keeps trust loop. Never falls flat.
+- **Best fit if assigned:** any realm.
+
+### Anti-pattern (do NOT build)
+
+- A web dashboard with multiple panes. Their brief explicitly punishes *"command center made for experts."* If you're reaching for Tailwind, stop.
+- Anything with a fake/mock backend. They want real messy data with judgment, not a polished demo of nothing.
+
+### Decision rule under pressure
+
+```
+Assigned realm? Build Tier 2 (Slack bot) as the base.
+Time left after Tier 2 works? Bolt on a Tier 1 element if it fits the realm.
+Time crunched? Drop to Tier 3 CLI. Don't try to half-build Tier 1.
+```
+
 ---
 
 # §1 — Day-of cheat sheet

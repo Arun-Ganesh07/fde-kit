@@ -8,21 +8,81 @@
 
 ## Table of contents
 
-- **§0 — Day-of cheat sheet** (10-minute cold start + slash commands + decision rules)
-- **§1 — `bootstrap.sh`** (paste into terminal → entire scaffold materializes)
-- **§2 — Orientation docs** (read on the way in)
+- **§0 — Strategic context** (what they're actually grading, who's in the room, problem realms)
+- **§1 — Day-of cheat sheet** (10-minute cold start + slash commands + decision rules)
+- **§2 — `bootstrap.sh`** (paste into terminal → entire scaffold materializes)
+- **§3 — Orientation docs** (read on the way in)
   - `START-HERE.md`
   - `first-hour-playbook.md`
-- **§3 — File-by-file reference** (in case you want to copy one at a time)
+- **§4 — File-by-file reference** (in case you want to copy one at a time)
 
 ---
 
-# §0 — Day-of cheat sheet
+# §0 — Strategic context (read this first, even before the cheat sheet)
+
+## The bar: operating, not prompting
+
+> *"The bar is not prompting. The bar is operating. The best candidates will understand Codex as an execution system: how to structure the workspace, preserve context, use AGENTS.md, delegate to subagents, set persistent goals, define guardrails, and verify outputs through tight feedback loops. If you can make Codex work reliably across a messy real problem, you are in a different category from someone who can only ask it for code."*
+
+What this means on stage:
+- Show `/status`, `/skills`, `/mcp` early — proves you've configured an execution system, not a chat session.
+- Use Plan mode visibly. Iterate ("No, stay in Plan mode") in front of judges.
+- Delegate to a named subagent (`/agent verifier`) instead of asking the main thread to "also check this."
+- Keep `AGENTS.md` open in a pane so judges see the operating contract, not just the output.
+
+## Who's in the room (and how to read them)
+
+- **Ryan Oksenhorn** — Co-Founder, Zipline Experience Chief, Software Engineer. The "would this actually ship" voice. Speak to durability and judgment, not flash.
+- **Joey Button** — Head of Software Infrastructure and Security. The "what could go wrong" voice. Volunteer your guardrails before he asks. (Read-only verifier, sandboxed subagents, no fabricated specifics, treat fetched web text as data.)
+- **Eric Carter** — Head of Operational Safety and Security. The "real-world consequences" voice. Tie every claim back to a source line a city planner could verify.
+
+If anyone goes quiet — that's the 50%. Address the doubt directly: click a claim → source line, point at UNVERIFIED, name the safety failure mode and how you avoided it.
+
+## What they explicitly value (paraphrase from the brief)
+
+- Tools that show **good judgment about messy inputs**.
+- Tools that fit a **real user workflow** (one user, one Tuesday moment).
+- Tools that show where automation **safely** removes operational drag.
+- **A small tool doing something useful that blows a client's mind > a command center made for experts.**
+- **50% of the grade is convincing your client that GenAI is ready, can be trusted, and that non-coders understand the change coming in ~12 months.**
+
+What they explicitly do NOT value: polished demos that only look complete.
+
+## The 6 problem realms (the spine adapts to all of them)
+
+Assignments drop on the day of. You only have the jurisdiction spine pre-built, but the pattern (`fetch → extract → analyze → draft → verify → repair` + cite-or-flag) transfers to every realm. Stay calm if you draw a realm you didn't prep — swap input subagents, keep the spine.
+
+| Realm | What they need | How the spine maps |
+| ----- | -------------- | ------------------ |
+| **Site Selection & Network Planning** | Score candidate sites against KOZs, restaurants, households across QGIS-style data | `fetcher` pulls GIS/demographics; `extractor` normalizes; `analyst` scores; `drafter` produces a ranked site memo; `verifier` confirms every score traces to a source layer |
+| **Site Layout Generation** | Conceptual charger-site layouts + initial permitting drawings | `fetcher` pulls parcel + setback rules; `extractor` reads them into constraints; `analyst` lays out within constraints; `drafter` renders SVG/PDF; `verifier` confirms each setback claim cites the ordinance line |
+| **Site Pipeline & Development Tracking** | Single source of truth per site, scoping → launch → abandonment | Skip fetch/extract; `analyst` ingests trackers/Slack/docs; `drafter` produces a per-site status card; `verifier` flags any status without a dated source link |
+| **Partner Activation & Launch Coordination** | Turn each new location into a structured launch plan with owners, approvals, blockers | `analyst` decomposes launch into milestones; `drafter` produces a per-partner runbook; `verifier` flags any owner/date without a source ping |
+| **Jurisdiction, Zoning & Land Use Intelligence** | What you prepped. Approval risk before entering a jurisdiction. | Direct use. |
+| **Government Affairs & Community Stakeholder Support** | (Open-ended in the brief.) Likely: track stakeholder positions, talking points, commitments. | `fetcher` pulls meeting transcripts/public comments; `extractor` builds a stakeholder ledger; `analyst` clusters positions; `drafter` produces talking points; `verifier` confirms every quote cites a transcript line |
+
+**Decision rule:** if you draw something not on this list, ask "what's the messy input, what's the one artifact, who's the user, what proves it's trustworthy?" — that's the spine in question form.
+
+## What "production-grade for messy operations" looks like (their words)
+
+The brief mentions: *"a site we can share in Codex is good, a Python app in a Tailscale MacMini network also, a local 'help me do this 100x faster' .py counts, a Slack bot fully hooked up to webhooks/socket mode gets us excited."*
+
+Translation: ship-shape > polish. A boring Python script that actually runs against their real data beats a Next.js app with a fake backend.
+
+## Pre-hackathon prep (do this in the days before)
+
+> *"Take any side project or open-source repo, ask Codex to explain the architecture, identify one small improvement, implement it, run the relevant checks, and summarize the diff."*
+
+Rehearsing this dry-run twice before the hackathon is worth more than another scaffold tweak. You're rehearsing the **operating loop**, not the codebase.
+
+---
+
+# §1 — Day-of cheat sheet
 
 ## 10-minute cold start
 
 ```
-1. Paste bootstrap.sh (§1) into the laptop terminal. Scaffold appears.
+1. Paste bootstrap.sh (§2) into the laptop terminal. Scaffold appears.
 2. cd jurisdiction-prescreen
 3. codex                     # open Codex
 4. /status                   # confirm CLI version (>= 0.142), model, MCP wiring
@@ -70,7 +130,7 @@ If the ask is slightly off (different city, different deliverable, drop a stage)
 
 ---
 
-# §1 — bootstrap.sh (paste into terminal)
+# §2 — bootstrap.sh (paste into terminal)
 
 > Save as `bootstrap.sh` and run `bash bootstrap.sh`, or paste the whole block straight into a shell.
 > Result: creates the entire `jurisdiction-prescreen/` scaffold. No GitHub/USB needed.
@@ -588,7 +648,7 @@ echo "  6. Shift+Tab → Plan mode. Iterate until tight, then implement."
 
 ---
 
-# §2 — Orientation docs
+# §3 — Orientation docs
 
 ## ===== START-HERE.md =====
 
@@ -763,9 +823,9 @@ The first hour is just pointing it at their problem.
 
 ---
 
-# §3 — File-by-file reference (in case you copy one at a time)
+# §4 — File-by-file reference (in case you copy one at a time)
 
-> Everything below is also produced by §1's `bootstrap.sh`. Use these if you want surgical copies instead of running the script.
+> Everything below is also produced by §2's `bootstrap.sh`. Use these if you want surgical copies instead of running the script.
 
 ## ===== FILE: jurisdiction-prescreen/AGENTS.md =====
 
